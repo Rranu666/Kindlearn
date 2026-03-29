@@ -39,11 +39,11 @@ export default function FlashcardView({ card, langId, onRate }) {
         <motion.div
           animate={{ rotateY: flipped ? 180 : 0 }}
           transition={{ duration: 0.45, ease: 'easeInOut' }}
-          style={{ transformStyle: 'preserve-3d', position: 'relative', minHeight: 220 }}
+          style={{ transformStyle: 'preserve-3d', position: 'relative', minHeight: 300 }}
         >
           {/* Front */}
           <div
-            className="absolute inset-0 bg-card rounded-3xl border-2 border-border shadow-xl flex flex-col items-center justify-center p-8 gap-3"
+            className="absolute inset-0 bg-card rounded-3xl border-2 border-border shadow-xl flex flex-col items-center justify-center p-8 gap-2 overflow-hidden"
             style={{ backfaceVisibility: 'hidden' }}
           >
             <span className="text-4xl md:text-5xl">{card.emoji}</span>
@@ -63,7 +63,7 @@ export default function FlashcardView({ card, langId, onRate }) {
 
           {/* Back */}
           <div
-            className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl border-2 border-primary/30 shadow-xl flex flex-col items-center justify-center p-8 gap-3"
+            className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl border-2 border-primary/30 shadow-xl flex flex-col items-center justify-center p-8 gap-2 overflow-hidden"
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >
             <span className="text-4xl md:text-5xl">{card.emoji}</span>

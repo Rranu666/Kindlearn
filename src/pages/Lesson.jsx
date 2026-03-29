@@ -32,6 +32,66 @@ const WORD_PAIRS = {
     { word: 'Non', meaning: 'No', audio: '❌' },
     { word: 'Ami', meaning: 'Friend', audio: '🤝' },
   ],
+  german: [
+    { word: 'Hallo', meaning: 'Hello', audio: '👋' },
+    { word: 'Danke', meaning: 'Thank you', audio: '🙏' },
+    { word: 'Bitte', meaning: 'Please', audio: '🤲' },
+    { word: 'Guten Morgen', meaning: 'Good morning', audio: '🌅' },
+    { word: 'Tschüss', meaning: 'Goodbye', audio: '👋' },
+    { word: 'Ja', meaning: 'Yes', audio: '✅' },
+    { word: 'Nein', meaning: 'No', audio: '❌' },
+    { word: 'Freund', meaning: 'Friend', audio: '🤝' },
+  ],
+  japanese: [
+    { word: 'こんにちは', meaning: 'Hello', audio: '👋' },
+    { word: 'ありがとう', meaning: 'Thank you', audio: '🙏' },
+    { word: 'おねがいします', meaning: 'Please', audio: '🤲' },
+    { word: 'おはようございます', meaning: 'Good morning', audio: '🌅' },
+    { word: 'さようなら', meaning: 'Goodbye', audio: '👋' },
+    { word: 'はい', meaning: 'Yes', audio: '✅' },
+    { word: 'いいえ', meaning: 'No', audio: '❌' },
+    { word: 'ともだち', meaning: 'Friend', audio: '🤝' },
+  ],
+  korean: [
+    { word: '안녕하세요', meaning: 'Hello', audio: '👋' },
+    { word: '감사합니다', meaning: 'Thank you', audio: '🙏' },
+    { word: '부탁드립니다', meaning: 'Please', audio: '🤲' },
+    { word: '좋은 아침', meaning: 'Good morning', audio: '🌅' },
+    { word: '안녕히 가세요', meaning: 'Goodbye', audio: '👋' },
+    { word: '네', meaning: 'Yes', audio: '✅' },
+    { word: '아니요', meaning: 'No', audio: '❌' },
+    { word: '친구', meaning: 'Friend', audio: '🤝' },
+  ],
+  italian: [
+    { word: 'Ciao', meaning: 'Hello', audio: '👋' },
+    { word: 'Grazie', meaning: 'Thank you', audio: '🙏' },
+    { word: 'Per favore', meaning: 'Please', audio: '🤲' },
+    { word: 'Buongiorno', meaning: 'Good morning', audio: '🌅' },
+    { word: 'Arrivederci', meaning: 'Goodbye', audio: '👋' },
+    { word: 'Sì', meaning: 'Yes', audio: '✅' },
+    { word: 'No', meaning: 'No', audio: '❌' },
+    { word: 'Amico', meaning: 'Friend', audio: '🤝' },
+  ],
+  portuguese: [
+    { word: 'Olá', meaning: 'Hello', audio: '👋' },
+    { word: 'Obrigado', meaning: 'Thank you', audio: '🙏' },
+    { word: 'Por favor', meaning: 'Please', audio: '🤲' },
+    { word: 'Bom dia', meaning: 'Good morning', audio: '🌅' },
+    { word: 'Tchau', meaning: 'Goodbye', audio: '👋' },
+    { word: 'Sim', meaning: 'Yes', audio: '✅' },
+    { word: 'Não', meaning: 'No', audio: '❌' },
+    { word: 'Amigo', meaning: 'Friend', audio: '🤝' },
+  ],
+  mandarin: [
+    { word: '你好', meaning: 'Hello', audio: '👋' },
+    { word: '谢谢', meaning: 'Thank you', audio: '🙏' },
+    { word: '请', meaning: 'Please', audio: '🤲' },
+    { word: '早上好', meaning: 'Good morning', audio: '🌅' },
+    { word: '再见', meaning: 'Goodbye', audio: '👋' },
+    { word: '是', meaning: 'Yes', audio: '✅' },
+    { word: '不', meaning: 'No', audio: '❌' },
+    { word: '朋友', meaning: 'Friend', audio: '🤝' },
+  ],
   default: [
     { word: 'Hello', meaning: 'Greeting', audio: '👋' },
     { word: 'Thank you', meaning: 'Gratitude', audio: '🙏' },
@@ -154,59 +214,67 @@ export default function Lesson() {
 
   const handleComplete = async () => {
     setCompleting(true);
-    if (pid) {
-      const prog = await progressApi.filter({ language: langId, mode: 'adult' });
-      const found = prog.find((r) => r.id === pid) || prog[0];
-      if (found) {
-        const p = found;
-        const completed = [...new Set([...(p.lessons_completed || []), day])];
-        const newXp = (p.xp_total || 0) + score * 10 + 20;
-        const newWords = (p.words_learned || 0) + words.length;
-        const newDay = Math.max(p.current_day || 1, day + 1);
-        const today = new Date().toISOString().split('T')[0];
-        const newStreak = p.last_activity_date !== today ? (p.streak_days || 0) + 1 : p.streak_days || 0;
+    try {
+      const effectivePid = pid && pid !== 'undefined' ? pid : null;
+      if (effectivePid) {
+        const prog = await progressApi.filter({ language: langId, mode: 'adult' });
+        const found = prog.find((r) => r.id === effectivePid) || prog[0];
+        if (found) {
+          const p = found;
+          const completed = [...new Set([...(p.lessons_completed || []), day])];
+          const newXp = (p.xp_total || 0) + score * 10 + 20;
+          const newWords = (p.words_learned || 0) + words.length;
+          const newDay = Math.max(p.current_day || 1, day + 1);
+          const today = new Date().toISOString().split('T')[0];
+          const newStreak = p.last_activity_date !== today ? (p.streak_days || 0) + 1 : p.streak_days || 0;
 
-        const newBadges = [...(p.badges || [])];
-        if (!newBadges.includes('first_lesson')) newBadges.push('first_lesson');
-        if (newStreak >= 3 && !newBadges.includes('streak_3')) newBadges.push('streak_3');
-        if (newStreak >= 7 && !newBadges.includes('streak_7')) newBadges.push('streak_7');
-        if (newStreak >= 14 && !newBadges.includes('streak_14')) newBadges.push('streak_14');
-        if (newStreak >= 30 && !newBadges.includes('streak_30')) newBadges.push('streak_30');
-        if (newWords >= 50 && !newBadges.includes('words_50')) newBadges.push('words_50');
-        if (newWords >= 100 && !newBadges.includes('words_100')) newBadges.push('words_100');
-        if (newXp >= 500 && !newBadges.includes('xp_500')) newBadges.push('xp_500');
-        if (newXp >= 1000 && !newBadges.includes('xp_1000')) newBadges.push('xp_1000');
-        const quizTotal = totalSteps - words.length - 1;
-        if (score === quizTotal && !newBadges.includes('perfect_quiz')) newBadges.push('perfect_quiz');
+          const newBadges = [...(p.badges || [])];
+          if (!newBadges.includes('first_lesson')) newBadges.push('first_lesson');
+          if (newStreak >= 3 && !newBadges.includes('streak_3')) newBadges.push('streak_3');
+          if (newStreak >= 7 && !newBadges.includes('streak_7')) newBadges.push('streak_7');
+          if (newStreak >= 14 && !newBadges.includes('streak_14')) newBadges.push('streak_14');
+          if (newStreak >= 30 && !newBadges.includes('streak_30')) newBadges.push('streak_30');
+          if (newWords >= 50 && !newBadges.includes('words_50')) newBadges.push('words_50');
+          if (newWords >= 100 && !newBadges.includes('words_100')) newBadges.push('words_100');
+          if (newXp >= 500 && !newBadges.includes('xp_500')) newBadges.push('xp_500');
+          if (newXp >= 1000 && !newBadges.includes('xp_1000')) newBadges.push('xp_1000');
+          const quizTotal = totalSteps - words.length - 1;
+          if (score === quizTotal && !newBadges.includes('perfect_quiz')) newBadges.push('perfect_quiz');
 
-        // Merge local struggle deltas with persisted data
-        const mergedStruggled = { ...(p.struggled_words || {}) };
-        for (const [word, delta] of Object.entries(localStruggled)) {
-          mergedStruggled[word] = Math.max(0, (mergedStruggled[word] || 0) + delta);
-          if (mergedStruggled[word] === 0) delete mergedStruggled[word];
+          // Merge local struggle deltas with persisted data
+          const mergedStruggled = { ...(p.struggled_words || {}) };
+          for (const [word, delta] of Object.entries(localStruggled)) {
+            mergedStruggled[word] = Math.max(0, (mergedStruggled[word] || 0) + delta);
+            if (mergedStruggled[word] === 0) delete mergedStruggled[word];
+          }
+
+          // Estimate lesson duration: ~2 min per word + quiz time
+          const lessonMinutes = Math.max(5, Math.round(words.length * 1.5 + 3));
+          // Reset daily practice if it's a new day
+          const prevPractice = p.last_activity_date === today ? (p.daily_practice_minutes || 0) : 0;
+
+          await progressApi.update(p.id, {
+            lessons_completed: completed,
+            xp_total: newXp,
+            words_learned: newWords,
+            current_day: Math.min(newDay, 30),
+            daily_xp: (p.daily_xp || 0) + score * 10 + 20,
+            streak_days: newStreak,
+            longest_streak: Math.max(p.longest_streak || 0, newStreak),
+            last_activity_date: today,
+            badges: newBadges,
+            struggled_words: mergedStruggled,
+            daily_practice_minutes: prevPractice + lessonMinutes,
+          });
         }
-
-        // Estimate lesson duration: ~2 min per word + quiz time
-        const lessonMinutes = Math.max(5, Math.round(words.length * 1.5 + 3));
-        // Reset daily practice if it's a new day
-        const prevPractice = p.last_activity_date === today ? (p.daily_practice_minutes || 0) : 0;
-
-        await progressApi.update(p.id, {
-          lessons_completed: completed,
-          xp_total: newXp,
-          words_learned: newWords,
-          current_day: Math.min(newDay, 30),
-          daily_xp: (p.daily_xp || 0) + score * 10 + 20,
-          streak_days: newStreak,
-          longest_streak: Math.max(p.longest_streak || 0, newStreak),
-          last_activity_date: today,
-          badges: newBadges,
-          struggled_words: mergedStruggled,
-          daily_practice_minutes: prevPractice + lessonMinutes,
-        });
       }
+    } catch (err) {
+      // Progress save failed — still navigate back; data will sync on next session
+      console.error('Failed to save lesson progress:', err);
+    } finally {
+      // Always navigate back to dashboard, even if the save failed
+      navigate(`/dashboard?lang=${langId}`, { replace: true });
     }
-    navigate(`/dashboard?lang=${langId}`, { replace: true });
   };
 
   return (

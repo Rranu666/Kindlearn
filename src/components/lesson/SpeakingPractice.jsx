@@ -108,7 +108,7 @@ const GRADE = (pct) =>
   : { label: 'Keep trying! 💪', color: 'text-rose-700', bg: 'from-rose-50 to-rose-100 border-rose-300' };
 
 export default function SpeakingPractice({ word, langId, onSpeak, onNext }) {
-  const { listen, isSupported: sttSupported } = useSpeechRecognition(langId);
+  const { listen, stopListening, isSupported: sttSupported } = useSpeechRecognition(langId);
   const { recordPitch, isSupported: pitchSupported } = usePitchAnalyzer();
   const { analyzeTranscript } = useAudioAnalysis();
   const [phase, setPhase] = useState('idle'); // idle | listening | result
@@ -159,6 +159,12 @@ export default function SpeakingPractice({ word, langId, onSpeak, onNext }) {
   };
 
   const handleRetry = () => { setPhase('idle'); setResult(null); };
+
+  const handleCancel = () => {
+    stopListening();
+    setPhase('idle');
+    setResult(null);
+  };
 
   if (!sttSupported) {
     return (
@@ -213,6 +219,12 @@ export default function SpeakingPractice({ word, langId, onSpeak, onNext }) {
             <Waveform />
             <LiveWaveform isRecording={true} />
             <p className="text-sm font-semibold text-primary animate-pulse">Listening & analyzing…</p>
+            <button
+              onClick={handleCancel}
+              className="text-xs text-muted-foreground hover:text-foreground border border-border rounded-full px-4 py-1.5 transition-colors"
+            >
+              Cancel
+            </button>
           </motion.div>
         )}
 

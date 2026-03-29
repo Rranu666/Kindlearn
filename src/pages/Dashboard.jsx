@@ -30,6 +30,7 @@ export default function Dashboard() {
 
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [notifiedMilestones, setNotifiedMilestones] = useState([]);
 
   useEffect(() => {
@@ -37,52 +38,61 @@ export default function Dashboard() {
   }, []);
 
   const loadProgress = async () => {
-    const today = new Date().toISOString().split('T')[0];
-    const list = await progressApi.filter({ language: langId, mode: 'adult' });
+    try {
+      setLoadError(null);
+      const today = new Date().toISOString().split('T')[0];
+      const list = await progressApi.filter({ language: langId, mode: 'adult' });
 
-    if (list.length > 0) {
-      let p = list[0];
+      if (list.length > 0) {
+        let p = list[0];
 
-      // Streak logic on login:
-      // - Same day: no change
-      // - Yesterday: increment streak
-      // - Older / missing: reset to 0
-      const last = p.last_activity_date;
-      if (last !== today) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
-        const newStreak = last === yesterdayStr ? (p.streak_days || 0) + 1 : 0;
-        const newLongest = Math.max(p.longest_streak || 0, newStreak);
-        const updated = await progressApi.update(p.id, {
-          streak_days: newStreak,
-          longest_streak: newLongest,
+        // Streak logic on dashboard load:
+        // - Same day: no change (lesson may have already updated it)
+        // - Yesterday: streak continues, increment
+        // - Older / missing: streak broken, reset to 0
+        const last = p.last_activity_date;
+        if (last !== today) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yesterdayStr = yesterday.toISOString().split('T')[0];
+          const newStreak = last === yesterdayStr ? (p.streak_days || 0) + 1 : 0;
+          const newLongest = Math.max(p.longest_streak || 0, newStreak);
+          try {
+            await progressApi.update(p.id, {
+              streak_days: newStreak,
+              longest_streak: newLongest,
+              last_activity_date: today,
+            });
+          } catch {
+            // streak update failure is non-fatal — show existing data
+          }
+          p = { ...p, streak_days: newStreak, longest_streak: newLongest, last_activity_date: today };
+          checkAndNotifyMilestones(p);
+        }
+
+        setProgress(p);
+      } else {
+        const created = await progressApi.create({
+          language: langId,
+          mode: 'adult',
+          current_day: 1,
+          xp_total: 0,
+          streak_days: 1,
+          longest_streak: 1,
+          lessons_completed: [],
+          daily_xp: 0,
+          words_learned: 0,
+          badges: [],
           last_activity_date: today,
         });
-        p = { ...p, streak_days: newStreak, longest_streak: newLongest, last_activity_date: today };
-
-        // Notify on milestone achievements
-        checkAndNotifyMilestones(p);
+        setProgress(created);
       }
-
-      setProgress(p);
-    } else {
-      const created = await progressApi.create({
-        language: langId,
-        mode: 'adult',
-        current_day: 1,
-        xp_total: 0,
-        streak_days: 1,
-        longest_streak: 1,
-        lessons_completed: [],
-        daily_xp: 0,
-        words_learned: 0,
-        badges: [],
-        last_activity_date: today,
-      });
-      setProgress(created);
+    } catch (err) {
+      console.error('Failed to load progress:', err);
+      setLoadError('Could not load your progress. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const checkAndNotifyMilestones = async (p) => {
@@ -119,6 +129,21 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
+        <p className="text-4xl">⚠️</p>
+        <p className="text-lg font-semibold text-foreground">{loadError}</p>
+        <button
+          onClick={() => { setLoading(true); loadProgress(); }}
+          className="mt-2 px-6 py-3 bg-primary text-white rounded-2xl font-semibold hover:bg-primary/90 transition-all"
+        >
+          Try Again
+        </button>
       </div>
     );
   }

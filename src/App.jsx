@@ -52,7 +52,7 @@ const AppRoutes = () => {
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 
       {/* Protected routes */}
-      <Route path="/" element={<PrivateRoute><Landing /></PrivateRoute>} />
+      <Route path="/" element={<Landing />} />
       <Route path="/select-language" element={<PrivateRoute><SelectLanguage /></PrivateRoute>} />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/lesson" element={<PrivateRoute><Lesson /></PrivateRoute>} />

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { authApi } from '@/api/auth';
+import { queryClientInstance } from '@/lib/query-client';
 
 const AuthContext = createContext();
 
@@ -31,6 +32,8 @@ export const AuthProvider = ({ children }) => {
   }, [checkAuth]);
 
   const login = async (email, password) => {
+    // Clear any cached data from a previous session before loading new user data
+    queryClientInstance.clear();
     const { user: u } = await authApi.login(email, password);
     setUser(u);
     setIsAuthenticated(true);
@@ -38,6 +41,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (email, password, name) => {
+    // Clear any cached data from a previous session before loading new user data
+    queryClientInstance.clear();
     const { user: u } = await authApi.register(email, password, name);
     setUser(u);
     setIsAuthenticated(true);
@@ -46,6 +51,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     authApi.logout();
+    // Wipe all cached query data so next user starts completely fresh
+    queryClientInstance.clear();
     setUser(null);
     setIsAuthenticated(false);
     window.location.href = '/login';

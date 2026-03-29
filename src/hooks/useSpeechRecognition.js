@@ -12,8 +12,15 @@ const LANG_CODES = {
   mandarin: 'zh-CN',
 };
 
-// Normalize text for loose comparison (lowercase, strip accents, punctuation)
+// Normalize text for loose comparison
+// Keeps CJK, Hangul, Hiragana, Katakana intact; strips accents from Latin
 function normalize(str) {
+  // For non-Latin scripts (Japanese, Korean, Chinese), keep original characters
+  // For Latin scripts, strip diacritics and punctuation
+  const hasCJK = /[\u3000-\u9fff\uac00-\ud7af\uf900-\ufaff]/.test(str);
+  if (hasCJK) {
+    return str.trim().toLowerCase();
+  }
   return str
     .toLowerCase()
     .normalize('NFD')
@@ -47,6 +54,16 @@ export function useSpeechRecognition(langId) {
   const isSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
+  // Store active recognition instance so it can be cancelled
+  let activeRec = null;
+
+  const stopListening = () => {
+    if (activeRec) {
+      try { activeRec.stop(); } catch (_) {}
+      activeRec = null;
+    }
+  };
+
   const listen = (targetWord) => {
     return new Promise((resolve) => {
       if (!isSupported) {
@@ -56,12 +73,14 @@ export function useSpeechRecognition(langId) {
 
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const rec = new SpeechRecognition();
+      activeRec = rec;
       rec.lang = langCode;
       rec.interimResults = false;
       rec.maxAlternatives = 3;
       rec.continuous = false;
 
       rec.onresult = (e) => {
+        activeRec = null;
         const alternatives = Array.from(e.results[0]);
         const transcripts = alternatives.map((alt) => alt.transcript.trim());
         const bestTranscript = transcripts[0] || '';
@@ -79,25 +98,28 @@ export function useSpeechRecognition(langId) {
       };
 
       rec.onerror = (e) => {
+        activeRec = null;
         if (e.error === 'no-speech') {
           resolve({ success: false, transcript: '', feedback: 'no_speech' });
+        } else if (e.error === 'aborted') {
+          resolve({ success: false, transcript: '', feedback: 'cancelled' });
         } else {
           resolve({ success: false, transcript: '', feedback: 'error' });
         }
       };
 
       rec.onend = () => {
-        // Fired after result or error — no-op since we resolve above
+        activeRec = null;
       };
 
       rec.start();
 
       // Safety timeout after 6s
       setTimeout(() => {
-        try { rec.stop(); } catch (_) {}
+        try { if (activeRec) { activeRec.stop(); activeRec = null; } } catch (_) {}
       }, 6000);
     });
   };
 
-  return { listen, isSupported };
+  return { listen, stopListening, isSupported };
 }
