@@ -137,7 +137,7 @@ export default function Hero() {
               whileHover={{ scale: 1.02, y: -15 }}
             >
               <div className="flex items-center justify-center gap-3 mb-6">
-                <img src="https://media.base44.com/images/public/69c628a74f059fbb5758435a/db189f0c6_kcf_icon_512px.png" alt="KindLearn free language learning app" className="w-9 h-9 rounded-xl" width="36" height="36" loading="lazy" />
+                <img src="/logo.png" alt="KindLearn free language learning app" className="w-9 h-9 rounded-xl" width="36" height="36" loading="lazy" />
                 <span className="font-bold text-sm">KindLearn</span>
               </div>
 

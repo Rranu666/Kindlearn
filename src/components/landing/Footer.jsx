@@ -11,7 +11,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="max-w-sm">
             <div className="flex items-center gap-2 mb-3">
-              <img src="https://media.base44.com/images/public/69c628a74f059fbb5758435a/db189f0c6_kcf_icon_512px.png" alt="KindLearn logo" className="w-9 h-9 rounded-xl shadow-md" width="36" height="36" loading="lazy" />
+              <img src="/logo.png" alt="KindLearn logo" className="w-9 h-9 rounded-xl shadow-md" width="36" height="36" loading="lazy" />
               <span className="font-extrabold text-xl tracking-tight">KindLearn</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed italic">

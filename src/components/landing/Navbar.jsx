@@ -15,7 +15,7 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b">
       <div className="container mx-auto px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
-          <img src="https://media.base44.com/images/public/69c628a74f059fbb5758435a/db189f0c6_kcf_icon_512px.png" alt="KindLearn logo" className="w-9 h-9 rounded-xl shadow-md" width="36" height="36" />
+          <img src="/logo.png" alt="KindLearn logo" className="w-9 h-9 rounded-xl shadow-md" width="36" height="36" />
           <span className="font-extrabold text-xl tracking-tight">KindLearn</span>
         </Link>
 
