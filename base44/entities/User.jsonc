@@ -1,0 +1,59 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user",
+      "description": "User role in the application"
+    },
+    "avatar": {
+      "type": "string",
+      "description": "User profile photo URL"
+    },
+    "bio": {
+      "type": "string",
+      "description": "User biography or about section"
+    },
+    "location": {
+      "type": "string",
+      "description": "User location"
+    },
+    "website": {
+      "type": "string",
+      "description": "User website or portfolio URL"
+    },
+    "twitter": {
+      "type": "string",
+      "description": "Twitter/X handle"
+    },
+    "facebook": {
+      "type": "string",
+      "description": "Facebook profile URL"
+    },
+    "instagram": {
+      "type": "string",
+      "description": "Instagram handle"
+    },
+    "linkedin": {
+      "type": "string",
+      "description": "LinkedIn profile URL"
+    },
+    "github": {
+      "type": "string",
+      "description": "GitHub username"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone number"
+    },
+    "learning_goals": {
+      "type": "string",
+      "description": "User's learning goals or interests"
+    }
+  }
+}

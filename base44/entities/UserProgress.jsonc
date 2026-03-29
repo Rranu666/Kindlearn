@@ -1,0 +1,135 @@
+{
+  "name": "UserProgress",
+  "type": "object",
+  "properties": {
+    "language": {
+      "type": "string",
+      "enum": [
+        "spanish",
+        "french",
+        "german",
+        "japanese",
+        "korean",
+        "italian",
+        "portuguese",
+        "mandarin"
+      ],
+      "description": "Selected language to learn"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "adult",
+        "kids"
+      ],
+      "default": "adult",
+      "description": "Learning mode"
+    },
+    "current_day": {
+      "type": "number",
+      "default": 1,
+      "description": "Current day in the 30-day challenge"
+    },
+    "xp_total": {
+      "type": "number",
+      "default": 0,
+      "description": "Total experience points earned"
+    },
+    "streak_days": {
+      "type": "number",
+      "default": 0,
+      "description": "Current streak in days"
+    },
+    "longest_streak": {
+      "type": "number",
+      "default": 0,
+      "description": "Longest streak achieved"
+    },
+    "lessons_completed": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Array of completed lesson day numbers"
+    },
+    "daily_xp": {
+      "type": "number",
+      "default": 0,
+      "description": "XP earned today"
+    },
+    "last_activity_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Last activity date for streak tracking"
+    },
+    "kid_name": {
+      "type": "string",
+      "description": "Child's display name for kids mode"
+    },
+    "kid_age_group": {
+      "type": "string",
+      "enum": [
+        "4-6",
+        "7-9",
+        "10-12"
+      ],
+      "description": "Age group for kids mode"
+    },
+    "kid_avatar": {
+      "type": "string",
+      "description": "Selected avatar character for kids"
+    },
+    "badges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Earned badge identifiers"
+    },
+    "words_learned": {
+      "type": "number",
+      "default": 0,
+      "description": "Total words learned"
+    },
+    "struggled_words": {
+      "type": "object",
+      "description": "Map of word -> miss count across all lessons",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "daily_goal_minutes": {
+      "type": "number",
+      "default": 10,
+      "description": "User's target practice minutes per day"
+    },
+    "daily_practice_minutes": {
+      "type": "number",
+      "default": 0,
+      "description": "Minutes practiced today"
+    },
+    "reminder_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether daily email reminders are enabled"
+    },
+    "reminder_time": {
+      "type": "string",
+      "default": "09:00",
+      "description": "Time to send daily reminder in HH:MM format (user's local time)"
+    },
+    "reminder_email": {
+      "type": "string",
+      "description": "Email address for reminders (defaults to account email)"
+    },
+    "reminder_timezone": {
+      "type": "string",
+      "default": "UTC",
+      "description": "User's timezone for reminder scheduling"
+    }
+  },
+  "required": [
+    "language",
+    "mode"
+  ]
+}

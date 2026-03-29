@@ -1,0 +1,52 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "milestone",
+        "achievement",
+        "task",
+        "update"
+      ],
+      "description": "Type of notification"
+    },
+    "title": {
+      "type": "string",
+      "description": "Notification title"
+    },
+    "message": {
+      "type": "string",
+      "description": "Notification message"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji icon for the notification"
+    },
+    "action_url": {
+      "type": "string",
+      "description": "Optional URL to navigate to when clicked"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether notification has been read"
+    },
+    "dismissed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether notification has been dismissed"
+    },
+    "language": {
+      "type": "string",
+      "description": "Language context for the notification"
+    }
+  },
+  "required": [
+    "type",
+    "title",
+    "message",
+    "icon"
+  ]
+}
