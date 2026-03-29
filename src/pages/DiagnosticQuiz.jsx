@@ -108,9 +108,11 @@ export default function DiagnosticQuiz() {
   const [score, setScore] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [showResult, setShowResult] = useState(false);
+  const [selectedIdx, setSelectedIdx] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const handleAnswer = (value) => {
+  const handleAnswer = (value, idx) => {
+    setSelectedIdx(idx);
     const newScore = score + value;
     setScore(newScore);
     setAnswers([...answers, value]);
@@ -119,6 +121,7 @@ export default function DiagnosticQuiz() {
       if (currentQuestion < QUIZ_QUESTIONS.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
         setShowResult(false);
+        setSelectedIdx(null);
       } else {
         setShowResult('final');
       }
@@ -212,21 +215,21 @@ export default function DiagnosticQuiz() {
                     {QUIZ_QUESTIONS[currentQuestion].options.map((option, idx) => (
                       <motion.button
                         key={idx}
-                        onClick={() => !showResult && handleAnswer(option.value)}
+                        onClick={() => !showResult && handleAnswer(option.value, idx)}
                         disabled={showResult}
                         whileHover={{ scale: showResult ? 1 : 1.02 }}
                         className={`w-full p-4 rounded-lg border-2 text-left font-medium transition-all ${
                           showResult
-                            ? option.correct
-                              ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                              : 'border-border opacity-50'
+                            ? idx === selectedIdx
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border opacity-40'
                             : 'border-border hover:border-primary hover:bg-primary/5'
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <span>{option.text}</span>
-                          {showResult && option.correct && (
-                            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                          {showResult && idx === selectedIdx && (
+                            <CheckCircle2 className="w-5 h-5 text-primary" />
                           )}
                         </div>
                       </motion.button>
